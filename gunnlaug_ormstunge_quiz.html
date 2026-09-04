@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="nn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz – Sagaen om Gunnlaug Ormstunge</title>
+<style>
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f6f7f9;
+    margin: 0;
+    color: #1f2937;
+    line-height: 1.5;
+  }
+  .wrap {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 24px 16px 40px;
+  }
+  .card {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 3px 14px rgba(0,0,0,.08);
+  }
+  h1 { font-size: 1.8rem; margin-top: 0; }
+  h2 { font-size: 1.35rem; }
+  .intro { font-size: 1.05rem; }
+  .progress {
+    margin: 18px 0;
+    font-weight: 700;
+  }
+  .bar {
+    height: 12px;
+    background: #e5e7eb;
+    border-radius: 999px;
+    overflow: hidden;
+    margin-top: 8px;
+  }
+  .fill {
+    height: 100%;
+    width: 0%;
+    background: #374151;
+    transition: width .25s;
+  }
+  .option {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 14px 16px;
+    margin: 10px 0;
+    border: 2px solid #d1d5db;
+    border-radius: 12px;
+    background: white;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+  .option:hover { background: #f3f4f6; }
+  .option:disabled { cursor: default; }
+  .correct { border-color: #15803d; background: #dcfce7; }
+  .wrong { border-color: #b91c1c; background: #fee2e2; }
+  .feedback {
+    margin-top: 18px;
+    padding: 14px;
+    border-radius: 12px;
+    background: #f3f4f6;
+    display: none;
+  }
+  .next, .start, .restart {
+    margin-top: 18px;
+    border: 0;
+    border-radius: 12px;
+    padding: 12px 18px;
+    font-size: 1rem;
+    font-weight: 700;
+    background: #111827;
+    color: white;
+    cursor: pointer;
+  }
+  .muted { color: #6b7280; }
+  .score { font-size: 1.4rem; font-weight: 700; }
+  .small { font-size: .95rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="app">
+    <div id="startScreen">
+      <h1>Sagaen om Gunnlaug Ormstunge</h1>
+      <p class="intro">Ein kort quiz om handlinga, personane og det viktigaste fagstoffet.</p>
+      <p><strong>18 spørsmål</strong> – eitt om gongen.</p>
+      <p class="muted">Du får svar og ei kort forklaring med ein gong.</p>
+      <button class="start" onclick="startQuiz()">Start quizen</button>
+    </div>
+
+    <div id="quizScreen" style="display:none;">
+      <div class="progress">
+        <span id="progressText"></span>
+        <div class="bar"><div class="fill" id="fill"></div></div>
+      </div>
+      <h2 id="question"></h2>
+      <div id="options"></div>
+      <div class="feedback" id="feedback"></div>
+      <button class="next" id="nextBtn" onclick="nextQuestion()" style="display:none;">Neste spørsmål</button>
+    </div>
+
+    <div id="endScreen" style="display:none;">
+      <h1>Ferdig!</h1>
+      <p class="score" id="scoreText"></p>
+      <p id="resultText"></p>
+      <button class="restart" onclick="restartQuiz()">Ta quizen på nytt</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const questions = [{"q": "Kven er dei tre viktigaste personane i kjærleikskonflikten?", "options": ["Gunnlaug, Helga og Ravn", "Torstein, Illuge og Skule", "Gunnlaug, Torstein og Torkjel", "Helga, Jofrid og Ravn"], "answer": 0, "explanation": "Gunnlaug og Ravn er rivalar, og begge vil ha Helga den fagre."}, {"q": "Kva varslar draumen til Torstein tidleg i sagaen?", "options": ["At Helga skal bli dronning", "At to menn skal kjempe om Helga og begge døy", "At Gunnlaug skal bli konge", "At familien skal flytte frå Island"], "answer": 1, "explanation": "Dei to ørnene i draumen varslar to menn som skal kjempe om Helga og miste livet."}, {"q": "Kvifor blir Gunnlaug kalla Ormstunge?", "options": ["Han er redd for slangar", "Han er ein dyktig sjømann", "Han er skarp i munnen og diktar nidviser", "Han har eit merke forma som ein orm"], "answer": 2, "explanation": "Gunnlaug er kjend for eit skarpt språk og for å lage spottande dikt."}, {"q": "Kva slags kunst er Gunnlaug særleg kjend for?", "options": ["Måleri", "Skaldedikt", "Runesteinar", "Folkeviser"], "answer": 1, "explanation": "Gunnlaug er skald og diktar kvad for kongar og jarlar."}, {"q": "Kva avtale gjer Torstein om Gunnlaug og Helga?", "options": ["Dei skal gifte seg med ein gong", "Helga skal vente i tre år medan Gunnlaug reiser utanlands", "Gunnlaug må vinne ein holmgang først", "Ravn skal bestemme kven Helga giftar seg med"], "answer": 1, "explanation": "Helga blir lova til Gunnlaug, men han må reise ut og kome tilbake innan avtalt tid."}, {"q": "Kva skjer mellom Gunnlaug og Ravn då dei møtest hos kong Olav i Sverige?", "options": ["Dei blir brør", "Dei konkurrerer om kven som er best skald, og vennskapet blir øydelagt", "Dei giftar seg med kvar si kvinne", "Dei reiser saman tilbake til Island"], "answer": 1, "explanation": "Dei kritiserer kvada til kvarandre, og Ravn seier at vennskapet er slutt."}, {"q": "Kvifor får Ravn til slutt gifte seg med Helga?", "options": ["Helga vel Ravn framfor Gunnlaug", "Gunnlaug kjem ikkje tilbake innan avtalt tid", "Gunnlaug giftar seg i England", "Torstein gløymer avtalen"], "answer": 1, "explanation": "Gunnlaug blir forseinka, og avtalen med Torstein går ut."}, {"q": "Korleis reagerer Helga på ekteskapet med Ravn?", "options": ["Ho er svært glad", "Ho gløymer Gunnlaug med ein gong", "Ho er ulykkelig og held fram med å elske Gunnlaug", "Ho reiser til England"], "answer": 2, "explanation": "Helga blir aldri glad i ekteskapet med Ravn og gløymer ikkje Gunnlaug."}, {"q": "Kva er ein holmgang?", "options": ["Eit bryllaup", "Ein lovleg avtalt tvekamp", "Ei reise over havet", "Eit møte på tinget"], "answer": 1, "explanation": "Holmgang er ein avtalt tvekamp som kunne brukast for å avgjere konfliktar."}, {"q": "Kva skjer med den første holmgangen mellom Gunnlaug og Ravn på Island?", "options": ["Gunnlaug vinn klart", "Ravn vinn klart", "Kampen blir avbroten utan klar vinnar", "Begge døyr"], "answer": 2, "explanation": "Ravn blir våpenlaus og Gunnlaug blir såra. Frendane bryt inn før saka er avgjord."}, {"q": "Kva skjer kort tid etter den første holmgangen?", "options": ["Holmgang blir forbode på Island", "Gunnlaug blir konge", "Ravn flyttar til England", "Helga skil seg frå Ravn"], "answer": 0, "explanation": "Lagretten vedtek at det skal vere slutt på holmgang på Island."}, {"q": "Kvifor møtest Gunnlaug og Ravn til ny kamp i Noreg?", "options": ["Dei vil vinne ein skatt", "Dei meiner konflikten framleis ikkje er avgjord", "Kongen tvingar dei", "Dei konkurrerer om eit kvad"], "answer": 1, "explanation": "Begge meiner konflikten står uløyst, og dei vil avgjere han utan at frendane stoppar dei."}, {"q": "Kva viser Ravn når Gunnlaug hentar vatn til han under den siste kampen?", "options": ["Han held ordet sitt", "Han gir opp kampen", "Han svik Gunnlaug og angrip han", "Han ber om fred"], "answer": 2, "explanation": "Ravn lovar å ikkje svike, men hogg Gunnlaug i hovudet då han får vatnet."}, {"q": "Kva blir utfallet av den siste kampen mellom Gunnlaug og Ravn?", "options": ["Begge overlever", "Ravn døyr, og Gunnlaug døyr kort tid etter", "Gunnlaug døyr, men Ravn overlever", "Begge reiser tilbake til Island"], "answer": 1, "explanation": "Gunnlaug drep Ravn, men døyr sjølv tre dagar seinare av såret."}, {"q": "Kva gjer Helga heilt mot slutten av livet?", "options": ["Ho brenn alle minna etter Gunnlaug", "Ho ser på kappa Gunnlaug gav henne", "Ho reiser til Noreg", "Ho skriv eit kvad om Ravn"], "answer": 1, "explanation": "Kappa er eit minne om Gunnlaug, som Helga aldri har gløymt."}, {"q": "Kva for eit tema passar best til sagaen?", "options": ["Kjærleik, ære og konflikt", "Naturvern og jordbruk", "Skule og utdanning", "Handel og rikdom"], "answer": 0, "explanation": "Sagaen handlar særleg om kjærleik, ære, rivalisering og konsekvensane av konflikt."}, {"q": "Kva er typisk for sagastilen i forteljinga?", "options": ["Lange forklaringar om kjenslene til alle", "Kort og direkte forteljing med mykje handling og replikkar", "Berre dikt utan handling", "Ein forteljar som heile tida forklarer kva vi skal meine"], "answer": 1, "explanation": "Sagaene fortel ofte kort og direkte, og viser mykje gjennom handling og replikkar."}, {"q": "Kva viser sagaen om betydninga av ætt og familie?", "options": ["Familien har nesten ingenting å seie", "Ætt, status og familie påverkar ekteskap og konfliktar", "Berre kongen bestemmer kven som giftar seg", "Alle vel fritt utan innblanding frå familien"], "answer": 1, "explanation": "Ætt, status og forholdet mellom familiar er viktig både i frieri, ekteskap og hemn."}];
+let current = 0;
+let score = 0;
+let answered = false;
+
+function startQuiz() {
+  document.getElementById('startScreen').style.display = 'none';
+  document.getElementById('quizScreen').style.display = 'block';
+  renderQuestion();
+}
+
+function renderQuestion() {
+  answered = false;
+  const q = questions[current];
+  document.getElementById('progressText').textContent = `Spørsmål ${current + 1} av ${questions.length}`;
+  document.getElementById('fill').style.width = `${((current) / questions.length) * 100}%`;
+  document.getElementById('question').textContent = q.q;
+  const box = document.getElementById('options');
+  box.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.textContent = opt;
+    btn.onclick = () => chooseAnswer(i, btn);
+    box.appendChild(btn);
+  });
+  document.getElementById('feedback').style.display = 'none';
+  document.getElementById('nextBtn').style.display = 'none';
+}
+
+function chooseAnswer(index, clicked) {
+  if (answered) return;
+  answered = true;
+  const q = questions[current];
+  const buttons = document.querySelectorAll('.option');
+  buttons.forEach((b, i) => {
+    b.disabled = true;
+    if (i === q.answer) b.classList.add('correct');
+  });
+  const feedback = document.getElementById('feedback');
+  if (index === q.answer) {
+    score++;
+    feedback.innerHTML = `<strong>Ja! ✓</strong><br>${q.explanation}`;
+  } else {
+    clicked.classList.add('wrong');
+    feedback.innerHTML = `<strong>Ikkje heilt.</strong><br>${q.explanation}`;
+  }
+  feedback.style.display = 'block';
+  document.getElementById('nextBtn').style.display = 'inline-block';
+}
+
+function nextQuestion() {
+  current++;
+  if (current < questions.length) {
+    renderQuestion();
+  } else {
+    finishQuiz();
+  }
+}
+
+function finishQuiz() {
+  document.getElementById('quizScreen').style.display = 'none';
+  document.getElementById('endScreen').style.display = 'block';
+  document.getElementById('scoreText').textContent = `${score} av ${questions.length} rette`;
+  let text = '';
+  if (score >= 16) {
+    text = 'Veldig bra! Du har fått godt tak på både handlinga og det viktigaste fagstoffet.';
+  } else if (score >= 12) {
+    text = 'Bra jobba! Du har fått med deg mykje. Sjå gjerne ein gong til på det du bomma på.';
+  } else if (score >= 8) {
+    text = 'Du er på veg. Ta quizen ein gong til – då sit mykje meir.';
+  } else {
+    text = 'Dette var første runde. Ta quizen ein gong til og bruk forklaringane undervegs.';
+  }
+  document.getElementById('resultText').textContent = text;
+}
+
+function restartQuiz() {
+  current = 0;
+  score = 0;
+  document.getElementById('endScreen').style.display = 'none';
+  document.getElementById('quizScreen').style.display = 'block';
+  renderQuestion();
+}
+</script>
+</body>
+</html>
