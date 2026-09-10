@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="nn">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz – Norrøn litteratur</title>
+<style>
+body{font-family:Arial,Helvetica,sans-serif;background:#f6f7f9;margin:0;color:#1f2937;line-height:1.5}
+.wrap{max-width:760px;margin:0 auto;padding:24px 16px 40px}.card{background:white;border-radius:16px;padding:24px;box-shadow:0 3px 14px rgba(0,0,0,.08)}
+h1{font-size:1.8rem;margin-top:0}h2{font-size:1.35rem}.progress{margin:18px 0;font-weight:700}.bar{height:12px;background:#e5e7eb;border-radius:999px;overflow:hidden;margin-top:8px}.fill{height:100%;width:0%;background:#374151;transition:width .25s}
+.option{display:block;width:100%;text-align:left;padding:14px 16px;margin:10px 0;border:2px solid #d1d5db;border-radius:12px;background:white;font-size:1rem;cursor:pointer}
+.option:hover{background:#f3f4f6}.option:disabled{cursor:default}.correct{border-color:#15803d;background:#dcfce7}.wrong{border-color:#b91c1c;background:#fee2e2}
+.feedback{margin-top:18px;padding:14px;border-radius:12px;background:#f3f4f6;display:none}
+.next,.start,.restart{margin-top:18px;border:0;border-radius:12px;padding:12px 18px;font-size:1rem;font-weight:700;background:#111827;color:white;cursor:pointer}
+.muted{color:#6b7280}.score{font-size:1.4rem;font-weight:700}
+</style></head>
+<body><div class="wrap"><div class="card">
+<div id="startScreen"><h1>Norrøn litteratur – repetisjon</h1>
+<p>18 spørsmål om det viktigaste fagstoffet.</p><p class="muted">Eitt spørsmål om gongen. Du får ei kort forklaring etter kvart svar.</p>
+<button class="start" onclick="startQuiz()">Start quizen</button></div>
+<div id="quizScreen" style="display:none"><div class="progress"><span id="progressText"></span><div class="bar"><div class="fill" id="fill"></div></div></div>
+<h2 id="question"></h2><div id="options"></div><div class="feedback" id="feedback"></div>
+<button class="next" id="nextBtn" onclick="nextQuestion()" style="display:none">Neste spørsmål</button></div>
+<div id="endScreen" style="display:none"><h1>Ferdig!</h1><p class="score" id="scoreText"></p><p id="resultText"></p>
+<button class="restart" onclick="restartQuiz()">Ta quizen på nytt</button></div>
+</div></div>
+<script>
+const questions = [{"q": "Kva meiner vi med norrøn litteratur?", "options": ["Munnleg overleverte dikt og forteljingar frå vikingtida som seinare blei skrivne ned", "Berre kristne tekstar skrivne i Noreg på 1500-talet", "Moderne romanar om vikingar", "Berre runetekstar frå jernalderen"], "answer": 0, "explanation": "Norrøn litteratur blei i stor grad skapt og fortald munnleg i vikingtida, og seinare skriven ned."}, {"q": "Når blei mykje av den norrøne litteraturen skriven ned?", "options": ["På 800-talet", "På 1000-talet", "På 1200-talet", "På 1500-talet"], "answer": 2, "explanation": "Mykje blei skapt tidlegare, men sjølve nedskrivinga skjedde i stor grad på 1200-talet."}, {"q": "Kvar blei mange av dei mest kjende norrøne tekstane skrivne ned?", "options": ["Danmark", "Island", "England", "Frankrike"], "answer": 1, "explanation": "Island blei eit viktig sentrum for å skrive ned norrøn litteratur."}, {"q": "Kva språk er dei norrøne tekstane skrivne på?", "options": ["Lågtysk", "Latin", "Norrønt", "Gammaldansk"], "answer": 2, "explanation": "Tekstane blei skrivne på norrønt."}, {"q": "Kva tre sjangrar blir rekna som dei viktigaste i norrøn litteratur?", "options": ["Eddadikt, skaldekvad og sagalitteratur", "Romanar, noveller og drama", "Salmar, eventyr og folkeviser", "Krøniker, brev og prekener"], "answer": 0, "explanation": "Eddadikt, skaldekvad og sagalitteratur er dei tre hovudsjangrane."}, {"q": "Kva er Den eldre Edda?", "options": ["Ei samling av eddadikt", "Ei samling av kongelover", "Ein roman av Snorre", "Ei bok med runeinskripsjonar"], "answer": 0, "explanation": "Den eldre Edda er den viktigaste samlinga av eddadikt."}, {"q": "Kva er typisk for eddadikta?", "options": ["Vi kjenner vanlegvis ikkje forfattaren", "Dei er alltid skrivne av kongar", "Dei handlar berre om kristne helgenar", "Dei er alltid lange prosaforteljingar"], "answer": 0, "explanation": "Eddadikta er anonyme; vi veit vanlegvis ikkje kven som skapte dei."}, {"q": "Kva handlar Håvamål mykje om?", "options": ["Råd om korleis ein bør leve", "Ei reise til Jerusalem", "Korleis ein byggjer vikingskip", "Historia om Olav den heilage"], "answer": 0, "explanation": "Håvamål inneheld råd om livet og seier mykje om verdiar i det norrøne samfunnet."}, {"q": "Kva verdi er spesielt viktig i Håvamål og mange sagaer?", "options": ["Rikdom", "Ære og ettermæle", "Utdanning", "Fred for ein kvar pris"], "answer": 1, "explanation": "Ære og ettermæle står svært sterkt i norrøn litteratur."}, {"q": "Kva er eit skaldekvad?", "options": ["Eit dikt laga og framført av ein skald", "Ei lov frå tinget", "Ei kort ættesaga", "Ei kristen bøn"], "answer": 0, "explanation": "Skalden var diktaren, og kvadet var diktet han framførte."}, {"q": "Kva skil ofte skaldekvad frå eddadikt?", "options": ["Vi kjenner ofte namnet på skalden", "Skaldekvad har aldri rim", "Skaldekvad handlar berre om gudar", "Skaldekvad blei aldri framførte høgt"], "answer": 0, "explanation": "I motsetning til eddadikta kjenner vi ofte namnet på skalden bak eit skaldekvad."}, {"q": "Kva type rim er typisk i norrøn poesi?", "options": ["Enderim", "Bokstavrim/allitterasjon", "Ingen form for rim", "Berre vokalrim"], "answer": 1, "explanation": "Norrøn poesi bruker mykje allitterasjon, altså bokstavrim."}, {"q": "Kva er eit typisk trekk ved sagastilen?", "options": ["Kort og refererande forteljemåte", "Svært lange skildringar av kjensler", "Ein forteljar som forklarer kva lesaren skal meine", "Mange overnaturlege detaljar i kvar scene"], "answer": 0, "explanation": "Sagaene fortel ofte kort, direkte og refererande."}, {"q": "Kvifor er slekta ofte ramsa opp i sagaene?", "options": ["Fordi ætt og familie var viktig for identitet og status", "Fordi forfattaren måtte fylle ut teksten", "Fordi alle sagaer var slektsforsking", "Fordi kongen kravde det"], "answer": 0, "explanation": "Ætta var svært viktig for identitet, status og konfliktar."}, {"q": "Kva slags konflikt går ofte igjen i sagalitteraturen?", "options": ["Konflikt om ære mellom personar eller familiar", "Konflikt om skulekarakterar", "Konflikt mellom by og land", "Konflikt om moderne politikk"], "answer": 0, "explanation": "Ære, krenking, hemn og konflikt mellom personar eller ætter er typiske drivkrefter i sagaene."}, {"q": "Kva er holmgang?", "options": ["Ein avtalt tvekamp", "Ei religiøs høgtid", "Ei handelsreise", "Ei form for dikt"], "answer": 0, "explanation": "Holmgang var ein avtalt tvekamp som kunne brukast til å avgjere konfliktar."}, {"q": "Kva meiner vi med blodhemn?", "options": ["At ei ætt hemnar skade eller drap på ein slektning", "At ein konge dømmer nokon til fengsel", "At ein skald skriv eit hyllingsdikt", "At to menn blir einige på tinget"], "answer": 0, "explanation": "Blodhemn handlar om at ætta svarer på drap eller alvorleg krenking med hemn."}, {"q": "Kvifor kan vi seie at norrøn litteratur er prega av to kulturar?", "options": ["Mange tekstar blei skapte i heidensk tid, men skrivne ned av kristne seinare", "Tekstane blei skrivne halvvegs på latin og halvvegs på gresk", "Sagaene blei skrivne både i Asia og Europa", "Forfattarane var alltid både prestar og kongar"], "answer": 0, "explanation": "Mykje av stoffet blei til i førkristen tid, medan nedskrivinga skjedde etter kristninga."}];
+let current=0,score=0,answered=false;
+function startQuiz(){document.getElementById('startScreen').style.display='none';document.getElementById('quizScreen').style.display='block';renderQuestion();}
+function renderQuestion(){
+answered=false;const q=questions[current];
+document.getElementById('progressText').textContent=`Spørsmål ${current+1} av ${questions.length}`;
+document.getElementById('fill').style.width=`${(current/questions.length)*100}%`;
+document.getElementById('question').textContent=q.q;
+const box=document.getElementById('options');box.innerHTML='';
+q.options.forEach((opt,i)=>{const b=document.createElement('button');b.className='option';b.textContent=opt;b.onclick=()=>chooseAnswer(i,b);box.appendChild(b);});
+document.getElementById('feedback').style.display='none';document.getElementById('nextBtn').style.display='none';
+}
+function chooseAnswer(index,clicked){
+if(answered)return;answered=true;const q=questions[current];const buttons=document.querySelectorAll('.option');
+buttons.forEach((b,i)=>{b.disabled=true;if(i===q.answer)b.classList.add('correct');});
+const f=document.getElementById('feedback');
+if(index===q.answer){score++;f.innerHTML=`<strong>Ja! ✓</strong><br>${q.explanation}`;}
+else{clicked.classList.add('wrong');f.innerHTML=`<strong>Ikkje heilt.</strong><br>${q.explanation}`;}
+f.style.display='block';document.getElementById('nextBtn').style.display='inline-block';
+}
+function nextQuestion(){current++;if(current<questions.length)renderQuestion();else finishQuiz();}
+function finishQuiz(){
+document.getElementById('quizScreen').style.display='none';document.getElementById('endScreen').style.display='block';
+document.getElementById('scoreText').textContent=`${score} av ${questions.length} rette`;
+let t='';if(score>=16)t='Veldig bra! Dette fagstoffet sit godt.';
+else if(score>=13)t='Bra jobba! Du har fått med deg mykje. Ta ein ny runde på det du bomma på.';
+else if(score>=9)t='Du er på veg. Ta quizen ein gong til – då festar stoffet seg betre.';
+else t='Dette er repetisjon. Sjå videoen ein gong til og prøv quizen på nytt.';
+document.getElementById('resultText').textContent=t;}
+function restartQuiz(){current=0;score=0;document.getElementById('endScreen').style.display='none';document.getElementById('quizScreen').style.display='block';renderQuestion();}
+</script></body></html>
